@@ -2,63 +2,65 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Company;
+use App\Http\Requests\CompanyRequest;
+use Illuminate\Http\Response;
 
 class CompanyController extends Controller
 {
-    // Display a list of all registered companies.
+    /**
+     * List all companies
+     */
     public function index()
     {
-        return Company::all();
+        return response()->json(Company::all(), Response::HTTP_OK);
     }
 
-    // Store a newly created company in the database.
+    /**
+     * Store a new company
+     */
     public function store(CompanyRequest $request)
     {
-        $company = Company::create($request->validated());
-        return response()->json($company, 201);
+        $validated = $request->validated();
+        $company = Company::create($validated);
+
+        return response()->json($company, Response::HTTP_CREATED);
     }
 
-    // Display a specific company by its tax ID.
-    public function show($tax_id)
+    /**
+     * Show a company by tax_id
+     */
+    public function show(CompanyRequest $request)
     {
+        $tax_id = $request->validated()['tax_id'];
         $company = Company::where('tax_id', $tax_id)->first();
 
-        if (!$company) {
-            return response()->json(['message' => 'Company not found'], 404);
-        }
-
-        return $company;
+        return response()->json($company, Response::HTTP_OK);
     }
 
-    // Update an existing company’s details.
-    public function update(CompanyRequest $request, $tax_id)
+    /**
+     * Update a company by tax_id
+     */
+    public function update(CompanyRequest $request)
     {
-        $company = Company::where('tax_id', $tax_id)->first();
+        $validated = $request->validated();
+        $company = Company::where('tax_id', $validated['tax_id'])->first();
 
-        if (!$company) {
-            return response()->json(['message' => 'Company not found'], 404);
-        }
+        $company->update($validated);
 
-        $company->update($request->validated());
-        return response()->json($company);
+        return response()->json($company, Response::HTTP_OK);
     }
 
-    // Delete a company only if it is inactive.
-    public function destroy($tax_id)
+    /**
+     * Delete a company by tax_id
+     */
+    public function destroy(CompanyRequest $request)
     {
+        $tax_id = $request->route('tax_id');
         $company = Company::where('tax_id', $tax_id)->first();
-
-        if (!$company) {
-            return response()->json(['message' => 'Company not found'], 404);
-        }
-
-        if ($company->active) {
-            return response()->json(['message' => 'Cannot delete an active company'], 400);
-        }
 
         $company->delete();
-        return response()->json(['message' => 'Company deleted']);
+
+        return response()->json(['message' => 'Company deleted successfully.']);
     }
 }
