@@ -11,8 +11,7 @@ class CompanyControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[Test]
-    public function it_creates_a_company_with_valid_data(): void
+    public function testCreatesCompanySuccessfully(): void
     {
         $response = $this->postJson('/api/companies', [
             'name' => 'Test Company',
@@ -30,8 +29,7 @@ class CompanyControllerTest extends TestCase
         $this->assertDatabaseHas('companies', ['tax_id' => '1234567890']);
     }
 
-    #[Test]
-    public function it_fails_to_create_company_with_invalid_data(): void
+    public function testValidationFailsOnCreateCompany(): void
     {
         $response = $this->postJson('/api/companies', []);
 
@@ -39,8 +37,7 @@ class CompanyControllerTest extends TestCase
                  ->assertJsonValidationErrors(['name', 'tax_id']);
     }
 
-    #[Test]
-    public function it_lists_all_companies(): void
+    public function testListsCompanies(): void
     {
         Company::factory()->create(['name' => 'Company A']);
         Company::factory()->create(['name' => 'Company B']);
@@ -55,8 +52,7 @@ class CompanyControllerTest extends TestCase
         ]);
     }
 
-    #[Test]
-    public function it_updates_an_existing_company(): void
+    public function testUpdatesCompanyData(): void
     {
         // Create original company
         $company = Company::factory()->create([
@@ -94,8 +90,7 @@ class CompanyControllerTest extends TestCase
         ]);
     }
 
-    #[Test]
-    public function it_shows_a_company_by_tax_id(): void
+    public function testShowsCompanyByTaxId(): void
     {
         // Create original company
         $company = Company::factory()->create([
@@ -122,8 +117,7 @@ class CompanyControllerTest extends TestCase
             ]);
     }
 
-    #[Test]
-    public function it_returns_422_when_company_tax_id_does_not_exist(): void
+    public function testRejectsNonexistentTaxId(): void
     {
         $response = $this->getJson("/api/companies/0000000000");
 
