@@ -13,7 +13,12 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        return response()->json(Company::all(), Response::HTTP_OK);
+        $companies = Company::all();
+
+        return response()->json([
+            'message' => 'List of all companies',
+            'data' => $companies
+        ]);
     }
 
     /**
@@ -24,7 +29,10 @@ class CompanyController extends Controller
         $validated = $request->validated();
         $company = Company::create($validated);
 
-        return response()->json($company, Response::HTTP_CREATED);
+        return response()->json([
+            'message' => 'Company created successfully',
+            'data' => $company
+        ], 201);
     }
 
     /**
@@ -35,7 +43,10 @@ class CompanyController extends Controller
         $tax_id = $request->validated()['tax_id'];
         $company = Company::where('tax_id', $tax_id)->first();
 
-        return response()->json($company, Response::HTTP_OK);
+        return response()->json([
+            'message' => 'Company details retrieved successfully',
+            'data' => $company
+        ]);
     }
 
     /**
@@ -48,7 +59,10 @@ class CompanyController extends Controller
 
         $company->update($validated);
 
-        return response()->json($company, Response::HTTP_OK);
+        return response()->json([
+            'message' => 'Company updated successfully',
+            'data' => $company
+        ]);
     }
 
     /**
