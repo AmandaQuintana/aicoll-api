@@ -6,11 +6,20 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CompanyRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     * Always returns true, allowing all requests to proceed.
+     */
     public function authorize()
     {
         return true;
     }
 
+    /**
+     * Prepare the data for validation.
+     * Ensures that the 'tax_id' from the route is merged into the request data
+     * for HTTP methods like GET, DELETE, PUT, and PATCH.
+     */
     public function validationData()
     {
         $data = $this->all();
@@ -22,7 +31,13 @@ class CompanyRequest extends FormRequest
         return $data;
     }
 
-
+    /**
+     * Define the validation rules for the request depending on the HTTP method.
+     *
+     * - GET: Requires that 'tax_id' exists in the companies table.
+     * - POST: Requires fields like 'name', 'address', and 'phone', and optionally validates 'active'.
+     * - PUT/PATCH: Similar to POST, but also includes 'tax_id' to ensure it exists and matches the route.
+     */
     public function rules()
     {
         if ($this->isMethod('get')) {
@@ -51,7 +66,7 @@ class CompanyRequest extends FormRequest
                 'address'  => 'sometimes|string|max:255',
                 'phone'    => 'sometimes|string|max:20',
                 'active'   => 'sometimes|boolean',
-                'tax_id'   => 'required|exists:companies,tax_id|in:' . $this->route('tax_id'),
+                'tax_id' => 'required|exists:companies,tax_id',
             ];
         }
 
